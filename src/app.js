@@ -7,14 +7,13 @@ dotenv.config();
 // const for app
 const app = express();
 
-// const for port
-const port = process.env.PORT || 3000;
-
 // route app
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
+// const for port
+const port = process.env.PORT;
 // listen app
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
