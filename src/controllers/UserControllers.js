@@ -1,6 +1,11 @@
 import UserModel from "../models/UserModel.js";
 import argon2 from "argon2";
 import HTTP_STATUS from "../utils/Status/httpStatus.js";
+import path from "path";
+import fs from "fs";
+
+// path to file log register
+const logFilePath = path.join(__dirname, "../app/logs/userController.logs");
 
 // Validasi untuk format email
 const isValidEmail = (email) => {
@@ -11,7 +16,7 @@ const isValidEmail = (email) => {
 // validasi untuk format nomor hp
 const isValidPhoneNumber = (phone_number) => {
   const phoneRegex = /^\d+$/;
-  return phoneRegex.test(phoneRegex);
+  return phoneRegex.test(phone_number);
 };
 
 export const Register = async (req, res) => {
@@ -78,9 +83,24 @@ export const Register = async (req, res) => {
       gender: gender,
       password: hashPassword,
     });
+
+    // menulis ke log
+    const logMessage = `User registered successfully: Surname: ${surname}, username: ${username}, Email: ${email}, Phone Number: ${phone_number}\n`;
+    fs.appendFile(logFilePath, logMessage, (err) => {
+      if (err) {
+        console.error("Failed write to log:", err.message);
+      }
+    });
     console.log("User Successfully Register!", username, email);
     res.status(HTTP_STATUS.CREATED).json({ message: "Register Successfully!" });
   } catch (error) {
+    // menulis ke log error
+    const errorMessage = `User register failed: ${error.message}\n`;
+    fs.appendFile(logFilePath, errorMessage, (err) => {
+      if (err) {
+        console.error("Failed write to log:", err.message);
+      }
+    });
     console.error("User Register Failed!", error.message);
     res
       .status(HTTP_STATUS.BAD_REQUEST)
